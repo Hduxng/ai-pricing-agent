@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BESTON AI Pricing Agent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <img src="/assets/market-signal.svg" alt="" class="brand-mark" />
+          <div>
+            <h1>BESTON <span>AI Pricing Agent</span></h1>
+            <p>Dynamic Pricing Control Room</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span class="connection-pill" id="runMode">Local demo</span>
+          <span class="status-pill" id="agentStatus">Ready</span>
+          <button class="secondary-button icon-text" id="refreshButton" type="button">
+            <span aria-hidden="true">↻</span>
+            Refresh
+          </button>
+          <button class="primary-button icon-text" id="runAllButton" type="button">
+            <span aria-hidden="true">▶</span>
+            Run agent
+          </button>
+        </div>
+      </header>
+
+      <main class="dashboard">
+        <section class="summary-grid" aria-label="Tổng quan">
+          <article class="metric-panel" style="--stagger: 0ms">
+            <div class="metric-head">
+              <span class="metric-icon" aria-hidden="true">▣</span>
+              <div class="metric-topline">
+                <span class="metric-label">SKU</span>
+                <span class="metric-token">Live</span>
+              </div>
+            </div>
+            <strong id="skuCount">0</strong>
+            <small>Đang theo dõi trong catalog</small>
+          </article>
+          <article class="metric-panel" style="--stagger: 80ms">
+            <div class="metric-head">
+              <span class="metric-icon" aria-hidden="true">₫</span>
+              <div class="metric-topline">
+                <span class="metric-label">Revenue</span>
+                <span class="metric-token neutral">VND</span>
+              </div>
+            </div>
+            <strong id="catalogValue">0đ</strong>
+            <small>Theo giá hiện tại</small>
+          </article>
+          <article class="metric-panel" style="--stagger: 160ms">
+            <div class="metric-head">
+              <span class="metric-icon" aria-hidden="true">%</span>
+              <div class="metric-topline">
+                <span class="metric-label">Avg margin</span>
+                <span class="metric-token neutral">Guarded</span>
+              </div>
+            </div>
+            <strong id="avgMargin">0%</strong>
+            <small>Ước tính sau guardrails</small>
+          </article>
+          <article class="metric-panel accent" style="--stagger: 240ms">
+            <div class="metric-head">
+              <span class="metric-icon" aria-hidden="true">⟳</span>
+              <div class="metric-topline">
+                <span class="metric-label">Last update</span>
+                <span class="metric-token" id="lastSource">-</span>
+              </div>
+            </div>
+            <strong id="lastUpdate">Chưa có</strong>
+            <small>Activity gần nhất từ agent</small>
+          </article>
+        </section>
+
+        <section class="impact-strip" aria-label="Before after impact">
+          <div class="impact-metrics">
+            <div class="impact-cell">
+              <span class="impact-label">Before</span>
+              <strong id="beforeValue">0đ</strong>
+              <small>Giá trị catalog hiện tại</small>
+            </div>
+            <div class="impact-cell">
+              <span class="impact-label">After approval</span>
+              <strong id="afterValue">0đ</strong>
+              <small>Nếu áp dụng proposal pending</small>
+            </div>
+            <div class="impact-cell">
+              <span class="impact-label">Delta</span>
+              <strong id="impactDelta">0đ</strong>
+              <small id="impactDeltaPct">0%</small>
+            </div>
+            <div class="impact-cell">
+              <span class="impact-label">Pending</span>
+              <strong id="pendingCount">0</strong>
+              <small>Proposal cần duyệt</small>
+            </div>
+          </div>
+          <div class="impact-progress" aria-hidden="true">
+            <span id="impactProgressFill"></span>
+          </div>
+        </section>
+
+        <section class="workspace">
+          <aside class="product-editor">
+            <div class="section-heading">
+              <div>
+                <h2>Sản phẩm</h2>
+                <p>Thông tin agent dùng để định giá</p>
+              </div>
+              <button class="ghost-button icon-text" id="resetFormButton" type="button">
+                <span aria-hidden="true">＋</span>
+                New
+              </button>
+            </div>
+            <form id="productForm" autocomplete="off">
+              <label>
+                <span>SKU</span>
+                <input name="sku" required placeholder="SKU004" />
+              </label>
+              <label>
+                <span>Tên</span>
+                <input name="name" required placeholder="Pin lithium 24V 100Ah" />
+              </label>
+              <label>
+                <span>Mô tả</span>
+                <textarea name="description" rows="4" placeholder="Thông số, phân khúc, điểm khác biệt"></textarea>
+              </label>
+              <div class="field-grid">
+                <label>
+                  <span>Giá vốn</span>
+                  <input name="base_cost" inputmode="numeric" required placeholder="2000000" />
+                </label>
+                <label>
+                  <span>Giá hiện tại</span>
+                  <input name="current_price" inputmode="numeric" required placeholder="3200000" />
+                </label>
+              </div>
+              <div class="field-grid">
+                <label>
+                  <span>Tồn kho</span>
+                  <input name="inventory" inputmode="numeric" placeholder="12" />
+                </label>
+                <label>
+                  <span>Từ khóa</span>
+                  <input name="keywords" placeholder="pin lithium 24V giá" />
+                </label>
+              </div>
+              <button class="primary-button wide icon-text" type="submit">
+                <span aria-hidden="true">✓</span>
+                Save product
+              </button>
+            </form>
+          </aside>
+
+          <section class="catalog-panel">
+            <div class="section-heading">
+              <div>
+                <h2>Catalog</h2>
+                <p id="catalogSubtitle">0 sản phẩm</p>
+              </div>
+              <div class="catalog-controls">
+                <label class="search-field">
+                  <span>Search</span>
+                  <input id="searchInput" type="search" placeholder="SKU, tên, từ khóa" />
+                </label>
+                <label class="sort-field">
+                  <span>Sort</span>
+                  <select id="sortSelect">
+                    <option value="sku">SKU</option>
+                    <option value="price_desc">Giá cao</option>
+                    <option value="margin_asc">Margin thấp</option>
+                    <option value="updated_desc">Mới cập nhật</option>
+                  </select>
+                </label>
+                <div class="segmented-control" role="tablist" aria-label="Bộ lọc">
+                  <button class="active" type="button" data-filter="all">All</button>
+                  <button type="button" data-filter="pending">Pending</button>
+                  <button type="button" data-filter="changed">Changed</button>
+                  <button type="button" data-filter="increase">Up</button>
+                  <button type="button" data-filter="hold">Hold</button>
+                </div>
+              </div>
+            </div>
+            <div class="product-list" id="productList"></div>
+          </section>
+
+          <aside class="activity-panel">
+            <div class="section-heading">
+              <div>
+                <h2>Activity</h2>
+                <p id="eventCount">0 events</p>
+              </div>
+            </div>
+            <div class="timeline" id="timeline"></div>
+          </aside>
+        </section>
+      </main>
+    </div>
+    <div class="detail-backdrop" id="detailBackdrop" hidden>
+      <aside class="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+        <div class="detail-header">
+          <div>
+            <span class="sku" id="detailSku">SKU</span>
+            <h2 id="detailTitle">Chi tiết sản phẩm</h2>
+            <p id="detailSubtitle">Agent decision detail</p>
+          </div>
+          <button class="ghost-button" id="closeDetailButton" type="button">Close</button>
+        </div>
+        <div class="detail-content" id="detailContent"></div>
+      </aside>
+    </div>
+    <div class="toast-stack" id="toastRoot" aria-live="polite" aria-atomic="false"></div>
+    <div class="confirm-backdrop" id="confirmBackdrop" hidden>
+      <section class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+        <div class="confirm-mark" aria-hidden="true">!</div>
+        <div class="confirm-copy">
+          <h2 id="confirmTitle">Xác nhận thao tác</h2>
+          <p id="confirmMessage">Bạn có chắc muốn tiếp tục?</p>
+        </div>
+        <div class="confirm-actions">
+          <button class="secondary-button" id="confirmCancelButton" type="button">Cancel</button>
+          <button class="danger-button" id="confirmActionButton" type="button">Confirm</button>
+        </div>
+      </section>
+    </div>
+    <script src="/assets/app.js" defer></script>
+  </body>
+</html>

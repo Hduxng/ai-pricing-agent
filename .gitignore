@@ -1,0 +1,34 @@
+# Environment and local config
+.env
+.env.*
+!.env.example
+.codex
+.git/
+
+# Runtime data
+pricing.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+agent.log
+
+# Python cache and test artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
