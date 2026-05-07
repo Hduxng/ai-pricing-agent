@@ -953,7 +953,16 @@ class DifyWorkflowClient:
             )
             response.raise_for_status()
         except Exception as exc:
-            raise DifyWorkflowError(f"Dify workflow request failed: {exc}") from exc
+            response_obj = getattr(exc, "response", None)
+            response_detail = ""
+            if response_obj is not None:
+                try:
+                    body = str(response_obj.text or "").strip()
+                except Exception:
+                    body = ""
+                if body:
+                    response_detail = f" | response: {body[:800]}"
+            raise DifyWorkflowError(f"Dify workflow request failed: {exc}{response_detail}") from exc
 
         try:
             result = response.json()
@@ -970,7 +979,7 @@ class DifyWorkflowClient:
         products_json = json.dumps(clean_products, ensure_ascii=False)
         inputs: dict[str, Any] = {
             "products_json": products_json,
-            "products_count": len(clean_products),
+            "products_count": str(len(clean_products)),
             "first_sku": clean_products[0]["sku"] if clean_products else "",
         }
         if self.input_format == "array":

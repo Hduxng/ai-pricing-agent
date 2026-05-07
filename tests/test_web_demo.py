@@ -234,7 +234,7 @@ def test_dify_workflow_client_sends_products_json_input():
     args, kwargs = session.post_calls[0]
     assert args[0] == "https://api.dify.ai/v1/workflows/run"
     assert kwargs["headers"]["Authorization"] == "Bearer app-test"
-    assert kwargs["json"]["inputs"]["products_count"] == 1
+    assert kwargs["json"]["inputs"]["products_count"] == "1"
     assert kwargs["json"]["inputs"]["first_sku"] == "SKU001"
     sent_products = json.loads(kwargs["json"]["inputs"]["products_json"])
     assert sent_products[0]["sku"] == "SKU001"
